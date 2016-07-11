@@ -1,0 +1,20 @@
+	<div id="registerDiv">
+		账号名称：<input ng-model="username" placeholder="请输入用户名"/><br/>
+登录密码：<input ng-model="password1"  type="password" placeholder="请输入密码"/><br/>
+
+确认密码：<input ng-model="password2"  type="password" placeholder="请输入密码"/><br/>
+
+<input  type="button" value="注册" ng-click="register()"/><br/>
+
+
+	</div>
+
+	<style>
+		#registerDiv{
+			text-align:center;
+		}
+
+		#registerDiv input {
+			width:50%;
+		}
+	</style>

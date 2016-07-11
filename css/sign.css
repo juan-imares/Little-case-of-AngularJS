@@ -1,0 +1,18 @@
+header{
+			position:relative;
+			text-align:center;
+			background:red;
+			height:3rem;
+			line-height:3rem;
+		}
+header i:first-child{
+	position:absolute;
+	left:10px;	
+	font-size:1rem;
+}
+header i:last-child{
+			position:absolute;
+			top:0px;
+			right:10px;	
+			font-size:30px;
+}

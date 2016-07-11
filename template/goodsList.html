@@ -1,0 +1,29 @@
+	<div id="goodslistDiv">
+		<div id="iconlist">
+	
+		</div>
+
+		
+		<ul>
+			<li ng-repeat="data in datalist">
+				<img src="{{data.goodsListImg}}" />
+				<p>{{data.goodsName}}</p>
+				<p>{{data.price | currency:"￥"}}</p>
+			</li>
+		</ul>
+	</div>
+
+	<style>
+		#iconlist i{
+			margin:10px;
+		}
+
+		#goodslistDiv ul li{
+			width:50%;
+			float:left;
+		}
+		#goodslistDiv ul li img{
+			width:100%;
+		}
+
+	</style>

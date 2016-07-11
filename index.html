@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html ng-app="myapp">
+<head>
+<meta charset="utf-8">
+
+<title>首页</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+<script type="text/javascript" src="lib/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="lib/angular.min.js"></script>
+<script type="text/javascript" src='lib/angular-route.min.js'></script>
+<link rel="stylesheet" type="text/css" href="iconfont/iconfont.css">
+<link rel="stylesheet" type="text/css" href="css/sign.css">
+<script>
+	document.getElementsByTagName("html")[0].style.fontSize=document.documentElement.clientWidth/20 +'px';
+</script>
+
+	<style>
+
+		*{margin:0;padding:0;}
+		
+	</style>
+</head>
+<body ng-controller="main">
+	<!-- 自定义指令 -->
+	<my-header></my-header>
+	<!-- 与路由配合使用 -->
+	<div ng-view></div>
+	<div ng-click="changePage('login')"><a>登陆</a></div>
+	<div ng-click="changePage('register')"><a>注册</a></div>
+</body>
+
+	<script>
+		var m1 = angular.module("myapp",["ngRoute"]);  //写入路由依赖
+		//配置路由模块
+		m1.config(['$routeProvider',function($routeProvider) {
+			
+			$routeProvider.when("/login",{
+				templateUrl:"template/login.html",
+				controller:"loginController"
+			}).when("/register",{
+				templateUrl:"template/register.html",
+				controller:"registerController"
+			}).when("/goodsList",{
+				templateUrl:"template/goodsList.html",
+				controller:"goodsListController"
+			}).otherwise({
+				redirectTo:"/"
+			})
+		}])
+		//自定义指令，可在四种模式下使用，加载my-header代码块
+		m1.directive("myHeader",function(){
+			return {
+				restrict:"ACEM",
+				templateUrl:"template/myheader.html"
+			}
+		})
+		//总控制器，在默认页面
+		m1.controller('main', ['$scope','$rootScope',"$location",function($scope,$rootScope,$location){
+				$rootScope.isBackShow =false;
+				$rootScope.isShopCarShow =false;
+				$rootScope.mytitle ="风信子";
+				// $scope.myvalue="myvalue";
+
+				$scope.changePage = function(data){
+					$location.path(data);
+				}
+		}]);
+		//注册页面控制器
+		m1.controller('registerController', ['$scope',"$rootScope","$http","myHttpRequest", function($scope,$rootScope,$http,myHttpRequest){
+			$scope.name = "registerController";
+			$rootScope.isBackShow =true;
+			$rootScope.isShopCarShow =false;
+			$rootScope.mytitle ="注册页面";
+
+			$scope.register = function(){
+				if($scope.password1 != $scope.password2){
+					alert("不一致");
+					return;
+				}
+				var data = {status:"register",userID:$scope.username,password:$scope.password1}
+				myHttpRequest.registerLogin(data,function(result){
+					if(result ==1 ){
+						$scope.changePage("login");
+					}
+				},function(){
+
+				})
+			}
+		}])
+
+		m1.controller('loginController', ['$scope',"$rootScope", "myHttpRequest", function($scope,$rootScope,myHttpRequest){
+			$scope.name = "loginController";
+			$rootScope.isBackShow =false;
+			$rootScope.isShopCarShow =false;
+			$rootScope.mytitle ="登录页面";
+
+
+			$scope.login = function(){
+				var data = {status:"login",userID:$scope.username,password:$scope.password}
+				myHttpRequest.registerLogin(data,function(result){
+					console.log(result);
+					if(result !=0 && result !=2){
+						$scope.changePage("goodsList");
+					}
+				},function(){
+
+				})
+			}
+		}])
+
+		m1.controller('goodsListController', ['$scope',"$rootScope","myHttpRequest" ,"$compile", function($scope,$rootScope,myHttpRequest,$compile ){
+			$scope.name = "goodsListController";
+			$rootScope.isBackShow =false;
+			$rootScope.isShopCarShow =true;
+			$rootScope.mytitle ="商品列表页面";
+
+
+			myHttpRequest.goodsHttp("http://datainfo.duapp.com/shopdata/getclass.php",{},function(datalist){
+				var allIconStr="";
+				angular.forEach(datalist, function(data, index) {
+					allIconStr +="<i class='iconfont' ng-click='changeGoodsList("+index+")'>"+data.icon+"</i>"	
+				});
+					//动态创建的这个标签中的指令没有办法被识别，
+					//$compile 手动编译服务，讲指令 跟当前$scope 给联系起来
+
+				$("#iconlist").html($compile(allIconStr)($scope));
+			})
+
+			$scope.changeGoodsList = function(result){
+				myHttpRequest.goodsListHttp("http://datainfo.duapp.com/shopdata/getGoods.php",{classID:result},function(data){
+					$scope.datalist =data;
+				})
+			}
+			$scope.changeGoodsList(0);
+		}])
+	</script>
+	<script src="js/service.js"></script>
+</html>
